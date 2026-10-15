@@ -1,0 +1,106 @@
+<div class="app-shell" dir="rtl">
+  <header class="topbar">
+    <a class="brand" routerLink="/" aria-label="سیمین، صفحه اصلی">
+      <span class="brand-mark">س</span>
+      <span>سیمین<span class="brand-caption">سرمایه‌گذاری در تولید</span></span>
+    </a>
+
+    <nav class="main-nav" aria-label="ناوبری اصلی">
+      <a routerLink="/" class="nav-link active">خانه</a>
+      <a routerLink="/projects" class="nav-link">فرصت‌های سرمایه‌گذاری</a>
+      <a routerLink="/about" class="nav-link">درباره سیمین</a>
+    </nav>
+
+    <div class="account-actions">
+      <a routerLink="/login" class="login-link">ورود</a>
+      <a routerLink="/register" class="button button-dark button-small">شروع همکاری <span>←</span></a>
+    </div>
+    <button class="mobile-menu" type="button" aria-label="باز کردن منو">☰</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="live-dot"></span> آینده تولید، با سرمایه‌گذاری هوشمند</div>
+        <h1>سرمایه شما،<br /><span>محرک تولید ایران</span></h1>
+        <p class="hero-description">سیمین، مسیر امن و شفاف اتصال سرمایه‌گذاران به فرصت‌های واقعی تولیدی است. پروژه‌ها را بررسی کنید و در رشد اقتصاد مولد سهیم شوید.</p>
+        <div class="hero-actions">
+          <a routerLink="/projects" class="button button-primary">مشاهده فرصت‌های سرمایه‌گذاری <span>←</span></a>
+          <a routerLink="/register" class="text-link">معرفی پروژه تولیدی <span>↗</span></a>
+        </div>
+        <div class="trust-note"><span class="avatars"><i>ن</i><i>م</i><i>ع</i></span><span>همراه با <b>۲,۴۰۰+</b> سرمایه‌گذار آینده‌نگر</span></div>
+      </div>
+      <div class="hero-art" aria-label="تصویرسازی رشد تولید">
+        <div class="art-grid"></div>
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="factory-card">
+          <div class="factory-sun">✳</div>
+          <div class="factory-building"><i></i><i></i><i></i><b></b></div>
+          <div class="factory-ground"></div>
+        </div>
+        <div class="floating-card investor-card"><span class="mini-icon">↗</span><span><b>سرمایه‌گذاری مولد</b><small>رشد واقعی، اثر ماندگار</small></span></div>
+        <div class="floating-card growth-card"><span class="growth-value">+۲۸٪</span><small>میانگین بازده هدف</small><div class="sparkline">⌁⌁⌁⌁⌁</div></div>
+        <span class="art-star star-one">✳</span><span class="art-star star-two">✳</span>
+      </div>
+      <div class="hero-bottom"><span>پلتفرم سرمایه‌گذاری در تولید</span><span>شفافیت · اعتماد · رشد پایدار</span></div>
+    </section>
+
+    <section class="metrics" aria-label="سیمین در یک نگاه">
+      <div><strong>۱۸۰<span>+</span></strong><small>پروژه تولیدی ارزیابی‌شده</small></div>
+      <div><strong>۸۶۰<span> میلیارد</span></strong><small>تومان سرمایه‌گذاری موفق</small></div>
+      <div><strong>۹۲<span>٪</span></strong><small>رضایت سرمایه‌گذاران</small></div>
+      <div><strong>۳۱<span> استان</span></strong><small>فرصت‌های سراسر ایران</small></div>
+    </section>
+
+    <section class="projects-section" id="projects">
+      <div class="section-heading">
+        <div><span class="section-kicker">فرصت‌های منتخب</span><h2>ایده‌های بزرگ، از همین‌جا شروع می‌شوند</h2><p>پروژه‌های تولیدی را با اطلاعات شفاف و ارزیابی دقیق بررسی کنید.</p></div>
+        <a routerLink="/projects" class="all-projects">مشاهده همه فرصت‌ها <span>←</span></a>
+      </div>
+      <div class="project-toolbar">
+        <div class="category-tabs" aria-label="فیلتر حوزه">
+          @for (category of categories; track category) {
+            <button type="button" [class.selected]="selectedCategory() === category" (click)="selectedCategory.set(category)">{{ category }}</button>
+          }
+        </div>
+        <label class="search-box"><span>⌕</span><input type="search" placeholder="جستجوی پروژه یا شهر..." (input)="updateSearch($event)" /></label>
+      </div>
+      <div class="project-grid">
+        @for (project of filteredProjects(); track project.id) {
+          <article class="project-card">
+            <div class="project-visual" [class]="'project-visual ' + project.tone">
+              <span class="project-symbol">{{ project.icon }}</span>
+              <span class="sector-pill">{{ project.sector }}</span>
+              <span class="verified">✓ ارزیابی‌شده</span>
+              <div class="visual-lines"></div>
+            </div>
+            <div class="project-content">
+              <div class="project-location"><span>⌖</span>{{ project.city }}</div>
+              <h3>{{ project.title }}</h3>
+              <div class="project-facts"><div><small>سرمایه موردنیاز</small><b>{{ project.requested }}</b></div><div><small>بازده هدف سالانه</small><b class="return">{{ project.returnLabel }}</b></div></div>
+              <div class="funding-row"><span>تأمین سرمایه</span><b>{{ project.funded }}٪</b></div>
+              <div class="progress-track"><span [style.width.%]="project.funded"></span></div>
+              <a [routerLink]="['/projects', project.id]" class="project-link">بررسی جزئیات <span>←</span></a>
+            </div>
+          </article>
+        } @empty {
+          <div class="empty-state">پروژه‌ای با این مشخصات پیدا نشد.</div>
+        }
+      </div>
+    </section>
+
+    <section class="process-section">
+      <div class="process-intro"><span class="section-kicker">شروعی ساده و مطمئن</span><h2>از انتخاب تا سرمایه‌گذاری،<br />همراه شما هستیم</h2><p>با اطلاعات قابل اتکا تصمیم بگیرید و قدم‌به‌قدم پیشرفت پروژه را دنبال کنید.</p><a routerLink="/register" class="button button-dark">حساب کاربری بسازید <span>←</span></a></div>
+      <div class="steps">
+        <article><span class="step-number">۰۱</span><div class="step-icon">⌕</div><h3>فرصت را پیدا کنید</h3><p>پروژه‌ها را بر اساس حوزه، مبلغ و بازده مورد انتظار مقایسه کنید.</p></article>
+        <article><span class="step-number">۰۲</span><div class="step-icon">◈</div><h3>با اطمینان بررسی کنید</h3><p>گزارش‌های مالی، ارزیابی ریسک و اطلاعات مجریان را ببینید.</p></article>
+        <article><span class="step-number">۰۳</span><div class="step-icon">↗</div><h3>در رشد سهیم شوید</h3><p>سرمایه‌گذاری خود را پیگیری کنید و گزارش پیشرفت بگیرید.</p></article>
+      </div>
+    </section>
+
+    <section class="cta-banner"><div><span class="section-kicker">برای تولیدکنندگان</span><h2>یک طرح تولیدی دارید؟</h2><p>فرصت خود را به شبکه‌ای از سرمایه‌گذاران معرفی کنید.</p></div><a routerLink="/register" class="button button-light">معرفی پروژه <span>←</span></a><span class="cta-decoration">س</span></section>
+  </main>
+
+  <footer class="footer"><a class="brand footer-brand" routerLink="/"><span class="brand-mark">س</span><span>سیمین<span class="brand-caption">سرمایه‌گذاری در تولید</span></span></a><p>ساختن آینده‌ای مولد، با سرمایه‌های امروز</p><span>© ۱۴۰۴ سیمین · تمام حقوق محفوظ است</span></footer>
+  <router-outlet />
+</div>
