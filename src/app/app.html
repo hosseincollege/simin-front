@@ -8,16 +8,98 @@
     <nav class="main-nav" aria-label="ناوبری اصلی">
       <a routerLink="/" class="nav-link active">خانه</a>
       <a routerLink="/projects" class="nav-link">فرصت‌های سرمایه‌گذاری</a>
-      <a routerLink="/about" class="nav-link">درباره سیمین</a>
+      <a routerLink="/workshops" class="nav-link">کارگاه‌ها</a>
     </nav>
 
     <div class="account-actions">
       <a routerLink="/login" class="login-link">ورود</a>
-      <a routerLink="/register" class="button button-dark button-small">شروع همکاری <span>←</span></a>
+      <a routerLink="/workshops/new" class="button button-dark button-small">ثبت کارگاه <span>←</span></a>
     </div>
-    <button class="mobile-menu" type="button" aria-label="باز کردن منو">☰</button>
+    <div class="appearance-controls">
+      <div class="theme-control">
+        <button
+          class="theme-trigger"
+          type="button"
+          aria-label="انتخاب تم"
+          aria-controls="theme-panel"
+          [attr.aria-expanded]="themeMenuOpen()"
+          (click)="toggleThemeMenu()"
+        >
+          <span aria-hidden="true">◐</span><span class="theme-trigger-label">تم</span>
+        </button>
+        @if (themeMenuOpen()) {
+          <section class="theme-panel" id="theme-panel" aria-label="انتخاب تم">
+            <h2>انتخاب تم</h2>
+            <div class="theme-mode-options" role="group" aria-label="حالت رنگ">
+              @for (mode of themeModes; track mode.value) {
+                <button type="button" [attr.aria-pressed]="themeMode() === mode.value" [class.selected]="themeMode() === mode.value" (click)="setThemeMode(mode.value)">{{ mode.label }}</button>
+              }
+            </div>
+          </section>
+        }
+      </div>
+      <div class="theme-control">
+        <button
+          class="theme-trigger"
+          type="button"
+          aria-label="تنظیم کنتراست"
+          aria-controls="contrast-panel"
+          [attr.aria-expanded]="contrastMenuOpen()"
+          (click)="toggleContrastMenu()"
+        >
+          <span aria-hidden="true">◒</span><span class="theme-trigger-label">کنتراست</span>
+        </button>
+        @if (contrastMenuOpen()) {
+          <section class="theme-panel contrast-panel" id="contrast-panel" aria-label="تنظیم کنتراست">
+            <h2>تنظیم کنتراست</h2>
+            <fieldset class="contrast-setting">
+              <legend>کنتراست روشن</legend>
+              <div class="contrast-options" role="group" aria-label="میزان کنتراست تم روشن">
+                @for (level of contrastLevels; track level.value) {
+                  <button type="button" [attr.aria-pressed]="lightContrast() === level.value" [class.selected]="lightContrast() === level.value" (click)="setContrast('light', level.value)">{{ level.label }}</button>
+                }
+              </div>
+            </fieldset>
+            <fieldset class="contrast-setting">
+              <legend>کنتراست تاریک</legend>
+              <div class="contrast-options" role="group" aria-label="میزان کنتراست تم تاریک">
+                @for (level of contrastLevels; track level.value) {
+                  <button type="button" [attr.aria-pressed]="darkContrast() === level.value" [class.selected]="darkContrast() === level.value" (click)="setContrast('dark', level.value)">{{ level.label }}</button>
+                }
+              </div>
+            </fieldset>
+          </section>
+        }
+      </div>
+    </div>
+    <button class="mobile-menu" type="button" aria-label="باز کردن منو" [attr.aria-expanded]="mobileMenuOpen()" (click)="toggleMobileMenu()">☰</button>
+    @if (mobileMenuOpen()) {
+      <nav class="mobile-nav-panel" aria-label="منوی موبایل">
+        <a routerLink="/" (click)="mobileMenuOpen.set(false)">خانه</a>
+        <a routerLink="/projects" (click)="mobileMenuOpen.set(false)">فرصت‌های سرمایه‌گذاری</a>
+        <a routerLink="/workshops" (click)="mobileMenuOpen.set(false)">کارگاه‌ها</a>
+        <a routerLink="/workshops/new" (click)="mobileMenuOpen.set(false)">ثبت کارگاه</a>
+        <a routerLink="/login" (click)="mobileMenuOpen.set(false)">ورود</a>
+        <a routerLink="/register" (click)="mobileMenuOpen.set(false)">ثبت‌نام</a>
+      </nav>
+    }
   </header>
 
+  <div class="workspace-layout">
+    <aside class="simin-sidebar" aria-label="ناوبری سیمین">
+      <span class="sidebar-label">سرمایه‌گذاری در تولید</span>
+      <a routerLink="/" class="sidebar-link">⌂ <span>نمای کلی</span></a>
+      <a routerLink="/projects" class="sidebar-link">◈ <span>فرصت‌های سرمایه‌گذاری</span></a>
+      <a routerLink="/workshops" class="sidebar-link">▦ <span>کارگاه‌های تولیدی</span></a>
+      <a routerLink="/workshops/new" class="sidebar-link">＋ <span>ثبت کارگاه جدید</span></a>
+      <a routerLink="/dashboard" class="sidebar-link">▤ <span>پنل کاربری</span></a>
+      <div class="sidebar-divider"></div>
+      <a routerLink="/login" class="sidebar-link">↪ <span>ورود</span></a>
+      <a routerLink="/register" class="sidebar-link">＋ <span>ساخت حساب</span></a>
+      <div class="sidebar-help"><b>برای تولیدکنندگان</b><p>کارگاهت را معرفی کن تا برای ارزیابی و جذب سرمایه دیده شود.</p><a routerLink="/workshops/new">شروع ثبت ←</a></div>
+    </aside>
+    <div class="workspace-content">
+  @if (isHomeRoute()) {
   <main>
     <section class="hero">
       <div class="hero-copy">
@@ -89,6 +171,15 @@
       </div>
     </section>
 
+    <section class="process-section" aria-labelledby="trust-title">
+      <div class="process-intro"><span class="section-kicker">تصمیم‌گیری بر پایه داده</span><h2 id="trust-title">قبل از سرمایه‌گذاری،<br />عملکرد را ببینید</h2><p>سیمین فقط فهرست فرصت‌ها نیست؛ ابزار بررسی کارگاه و پیگیری نتیجه سرمایه‌گذاری هم هست.</p><a routerLink="/projects" class="button button-dark">بررسی فرصت‌ها <span>←</span></a></div>
+      <div class="steps">
+        <article><span class="step-number">۱</span><div class="step-icon">▤</div><h3>گزارش‌های ماهانه</h3><p>فروش، میزان تولید و هزینه‌های کارگاه را در گزارش‌های دوره‌ای کنار هم ببینید.</p></article>
+        <article><span class="step-number">۲</span><div class="step-icon">⌁</div><h3>سود و عملکرد روشن</h3><p>روند درآمد، هزینه و سود را بررسی کنید تا ارزیابی طرح به یک عدد بازده محدود نماند.</p></article>
+        <article><span class="step-number">۳</span><div class="step-icon">◈</div><h3>ارزیابی و نظر جمعی</h3><p>مدارک و سابقه کارگاه را بررسی کنید و دیدگاه سرمایه‌گذاران را در تصمیم‌گیری لحاظ کنید.</p></article>
+      </div>
+    </section>
+
     <section class="process-section">
       <div class="process-intro"><span class="section-kicker">شروعی ساده و مطمئن</span><h2>از انتخاب تا سرمایه‌گذاری،<br />همراه شما هستیم</h2><p>با اطلاعات قابل اتکا تصمیم بگیرید و قدم‌به‌قدم پیشرفت پروژه را دنبال کنید.</p><a routerLink="/register" class="button button-dark">حساب کاربری بسازید <span>←</span></a></div>
       <div class="steps">
@@ -101,6 +192,11 @@
     <section class="cta-banner"><div><span class="section-kicker">برای تولیدکنندگان</span><h2>یک طرح تولیدی دارید؟</h2><p>فرصت خود را به شبکه‌ای از سرمایه‌گذاران معرفی کنید.</p></div><a routerLink="/register" class="button button-light">معرفی پروژه <span>←</span></a><span class="cta-decoration">س</span></section>
   </main>
 
+  } @else {
+    <router-outlet />
+  }
+
   <footer class="footer"><a class="brand footer-brand" routerLink="/"><span class="brand-mark">س</span><span>سیمین<span class="brand-caption">سرمایه‌گذاری در تولید</span></span></a><p>ساختن آینده‌ای مولد، با سرمایه‌های امروز</p><span>© ۱۴۰۴ سیمین · تمام حقوق محفوظ است</span></footer>
-  <router-outlet />
+    </div>
+  </div>
 </div>

@@ -1,0 +1,405 @@
+app-root {
+  --ink: var(--text) !important;
+  --muted: var(--text-muted) !important;
+  --green: var(--accent) !important;
+  --mint: var(--green-soft) !important;
+  --line: var(--border) !important;
+  color: var(--text);
+}
+
+app-root .app-shell {
+  min-height: 100vh;
+  background: var(--page-bg);
+  color: var(--text);
+}
+
+app-root .topbar,
+app-root .footer,
+app-root .hero-bottom {
+  border-color: var(--border);
+}
+
+app-root .brand,
+app-root .trust-note b,
+app-root .metrics strong,
+app-root .project-content h3,
+app-root .funding-row b,
+app-root .steps h3 {
+  color: var(--text) !important;
+}
+
+app-root .nav-link,
+app-root .login-link,
+app-root .hero-description,
+app-root .trust-note,
+app-root .section-heading p,
+app-root .process-intro p,
+app-root .project-location,
+app-root .project-facts small,
+app-root .funding-row,
+app-root .steps p,
+app-root .footer,
+app-root .hero-bottom {
+  color: var(--text-muted) !important;
+}
+
+app-root .metrics,
+app-root .process-section {
+  background: var(--surface-alt) !important;
+}
+
+app-root .project-card,
+app-root .floating-card,
+app-root .search-box,
+app-root .step-icon {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+app-root .project-facts,
+app-root .project-link {
+  border-color: var(--border);
+}
+
+app-root .search-box input {
+  color: var(--text);
+}
+
+app-root .category-tabs button {
+  color: var(--text-muted) !important;
+}
+
+app-root .category-tabs button.selected {
+  background: var(--green-soft) !important;
+  color: var(--accent) !important;
+}
+
+app-root .button-dark {
+  background: var(--text) !important;
+  color: var(--page-bg) !important;
+}
+
+app-root .button-primary {
+  background: var(--text) !important;
+  color: var(--page-bg) !important;
+  box-shadow: inset 0 -2px var(--accent);
+}
+
+app-root .button-light {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+app-root .hero h1 span {
+  color: var(--text) !important;
+}
+
+app-root .eyebrow {
+  background: var(--surface-alt) !important;
+}
+
+app-root .project-visual.blue,
+app-root .project-visual.green,
+app-root .project-visual.violet,
+app-root .project-visual.amber {
+  background: var(--surface-alt) !important;
+  color: var(--text-muted) !important;
+}
+
+app-root .project-visual.blue {
+  background: linear-gradient(140deg, var(--visual-blue), var(--surface-alt)) !important;
+}
+
+app-root .project-visual.green {
+  background: linear-gradient(140deg, var(--visual-green), var(--surface-alt)) !important;
+}
+
+app-root .project-visual.violet {
+  background: linear-gradient(140deg, var(--visual-violet), var(--surface-alt)) !important;
+}
+
+app-root .project-visual.amber {
+  background: linear-gradient(140deg, var(--visual-amber), var(--surface-alt)) !important;
+}
+
+app-root .factory-card {
+  border-color: var(--border) !important;
+  background: linear-gradient(145deg, var(--factory-bg), var(--green-soft)) !important;
+  box-shadow: 0 30px 65px #185d4015 !important;
+}
+
+app-root .factory-card::before,
+app-root .factory-card::after {
+  background: var(--surface) !important;
+  opacity: 0.45;
+}
+
+app-root .factory-building {
+  background: var(--factory-building) !important;
+}
+
+app-root .factory-building i {
+  background: var(--surface-alt) !important;
+}
+
+app-root .factory-building b {
+  background: color-mix(in srgb, var(--factory-building) 68%, #000) !important;
+}
+
+app-root .factory-sun {
+  color: var(--factory-ground) !important;
+}
+
+app-root .factory-ground {
+  background: var(--factory-ground) !important;
+}
+
+app-root .orbit {
+  border-color: var(--border) !important;
+}
+
+app-root .art-grid {
+  background-image: radial-gradient(var(--border) 1px, transparent 1px) !important;
+}
+
+app-root .avatars i,
+app-root .mini-icon {
+  border-color: var(--page-bg);
+  background: var(--surface-alt) !important;
+  color: var(--accent) !important;
+}
+
+app-root .avatars i {
+  border-color: var(--page-bg);
+  background: #e3eee7 !important;
+  color: #315e4b !important;
+}
+
+app-root .avatars i:nth-child(2) {
+  background: #f1e8da !important;
+  color: #806447 !important;
+}
+
+app-root .avatars i:nth-child(3) {
+  background: #e5e8f1 !important;
+  color: #4e5d83 !important;
+}
+
+app-root .cta-banner {
+  background: var(--surface-alt) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border);
+}
+
+app-root .cta-banner p {
+  color: var(--text-muted) !important;
+}
+
+app-root .cta-banner .section-kicker {
+  color: var(--accent) !important;
+}
+
+app-root .cta-decoration {
+  color: #8882;
+}
+
+app-root .theme-control {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+app-root .appearance-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+app-root .theme-trigger {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+app-root .theme-trigger > span:first-child {
+  color: var(--accent);
+  font-size: 18px;
+}
+
+app-root .theme-trigger:focus-visible,
+app-root .theme-panel button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+app-root .theme-panel {
+  position: absolute;
+  z-index: 20;
+  inset-block-start: calc(100% + 10px);
+  inset-inline-end: 0;
+  width: min(310px, calc(100vw - 36px));
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 16px 42px #0002;
+}
+
+app-root .theme-panel h2 {
+  margin: 0 0 14px;
+  font-size: 14px;
+}
+
+app-root .theme-mode-options,
+app-root .contrast-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+app-root .theme-mode-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+app-root .theme-panel button {
+  min-height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+app-root .theme-panel button.selected {
+  border-color: var(--accent);
+  background: var(--green-soft);
+  color: var(--text);
+  font-weight: 700;
+}
+
+app-root .contrast-setting {
+  min-width: 0;
+  margin: 15px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+app-root .contrast-setting legend {
+  margin-bottom: 8px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+app-root .mobile-menu {
+  color: var(--text);
+}
+
+.page-overlay {
+  background: var(--surface-alt) !important;
+}
+
+.page-card {
+  border-color: var(--border) !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+.page-card p,
+.page-card label,
+.page-card h1,
+.page-card h2,
+.page-card b,
+.page-card .page-brand,
+.page-card .page-back,
+.page-card .page-switch a {
+  color: var(--text) !important;
+}
+
+.page-card input,
+.page-project-list a,
+.detail-summary,
+.detail-stats div {
+  border-color: var(--border) !important;
+  background: var(--surface-alt) !important;
+  color: var(--text) !important;
+}
+
+.page-card .page-heading p,
+.page-card .detail-copy,
+.page-card .page-switch,
+.page-card .detail-summary p,
+.detail-stats small,
+.page-project-list span {
+  color: var(--text-muted) !important;
+}
+
+@media (max-width: 700px) {
+  app-root .theme-trigger-label {
+    display: none;
+  }
+
+  app-root .theme-trigger {
+    width: 40px;
+    padding: 0;
+  }
+}
+
+app-root .simin-sidebar {
+  border-color: var(--border) !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+app-root .sidebar-label,
+app-root .sidebar-link {
+  color: var(--text-muted) !important;
+}
+
+app-root .sidebar-link:hover,
+app-root .sidebar-link.router-link-active {
+  background: var(--green-soft) !important;
+  color: var(--accent) !important;
+}
+
+app-root .sidebar-divider {
+  background: var(--border) !important;
+}
+
+app-root .sidebar-help {
+  background: var(--surface-alt) !important;
+  color: var(--text) !important;
+}
+
+app-root .sidebar-help p {
+  color: var(--text-muted) !important;
+}
+
+app-root .sidebar-help a {
+  color: var(--accent) !important;
+}
+
+app-portal-page .page-overlay {
+  position: relative !important;
+  inset: auto !important;
+  z-index: auto !important;
+  display: block !important;
+  min-height: calc(100vh - 180px);
+  padding: 24px 0 !important;
+  background: transparent !important;
+}
+
+app-portal-page .page-card {
+  margin-inline: auto;
+}
