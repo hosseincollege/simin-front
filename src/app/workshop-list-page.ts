@@ -1,7 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DEMO_WORKSHOPS } from './workshop-demo-data';
-import { readLocalWorkshops } from './workshop-store';
 
 const API_BASE_URL = (globalThis as typeof globalThis & { SIMIN_API_URL?: string }).SIMIN_API_URL
   ?? 'http://localhost:3001';
@@ -47,11 +46,11 @@ export class WorkshopListPage {
         if (response.ok) {
           const data = await response.json() as WorkshopCard[] | { results?: WorkshopCard[] };
           const records = Array.isArray(data) ? data : data.results || [];
-          if (records.length) { this.workshops.set([...readLocalWorkshops(), ...records]); return; }
+          if (records.length) { this.workshops.set(records); return; }
         }
       } catch { /* Fall back to the sample records while the workshop API is being built. */ }
       this.demoMode.set(true);
-      this.workshops.set([...readLocalWorkshops(), ...DEMO_WORKSHOPS]);
+      this.workshops.set(DEMO_WORKSHOPS);
       if (!this.workshops().length) this.error.set('دریافت فهرست کارگاه‌ها ناموفق بود.');
     }
     finally { this.loading.set(false); }

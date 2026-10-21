@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, HostListener, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 
@@ -28,7 +28,13 @@ export class App {
   readonly currentPath = signal('/');
   readonly isHomeRoute = computed(() => this.currentPath() === '/');
   readonly mobileMenuOpen = signal(false);
+  readonly accountMenuOpen = signal(false);
   readonly authUser = signal<{ name: string; username: string; role: string } | null>(null);
+
+  @HostListener('document:click', ['$event'])
+  closeAccountMenuOnOutsideClick(event: MouseEvent) {
+    if (!(event.target as HTMLElement | null)?.closest('.account-menu')) this.accountMenuOpen.set(false);
+  }
   readonly themeMode = signal<ThemeMode>('system');
   readonly lightContrast = signal<ContrastLevel>('standard');
   readonly darkContrast = signal<ContrastLevel>('standard');

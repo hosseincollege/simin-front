@@ -4,78 +4,37 @@
       <span class="brand-mark">س</span>
       <span>سیمین<span class="brand-caption">سرمایه‌گذاری در تولید</span></span>
     </a>
-
-    <nav class="main-nav" aria-label="ناوبری اصلی">
-      <a routerLink="/workshops" class="nav-link active">کارگاه‌های تولیدی</a>
-    </nav>
-
     <div class="account-actions">
-      @if (authUser(); as user) {
-        <a routerLink="/dashboard" class="login-link">{{ user.name }}</a>
-        <a routerLink="/workshops/new" class="button button-dark button-small">ایجاد کارگاه</a>
-        <button type="button" class="login-link logout-button" (click)="logout()">خروج</button>
-      } @else {
-        <a routerLink="/login" class="login-link">ورود</a>
-        <a routerLink="/register" class="login-link">ساخت حساب</a>
-      }
-    </div>
-    <div class="appearance-controls">
-      <div class="theme-control">
-        <button
-          class="theme-trigger"
-          type="button"
-          [attr.aria-label]="'تغییر تم؛ وضعیت فعلی: ' + themeModeLabel()"
-          [title]="'تم: ' + themeModeLabel()"
-          (click)="cycleTheme()"
-        >
-          <span aria-hidden="true">{{ themeModeIcon() }}</span><span class="theme-trigger-label">{{ themeModeLabel() }}</span>
+      <div class="account-menu">
+        <button type="button" class="account-trigger" [attr.aria-expanded]="accountMenuOpen()" (click)="accountMenuOpen.update(open => !open)">
+          <span class="account-avatar" aria-hidden="true">&#9673;</span><span>{{ authUser()?.name || "&#1581;&#1587;&#1575;&#1576; &#1705;&#1575;&#1585;&#1576;&#1585;&#1740;" }}</span><span class="account-chevron" aria-hidden="true">&#8964;</span>
         </button>
+        @if (accountMenuOpen()) {
+          <div class="account-popover">
+            @if (authUser()) { <button type="button" (click)="logout(); accountMenuOpen.set(false)">&#1582;&#1585;&#1608;&#1580;</button> }
+            @else { <a routerLink="/login" (click)="accountMenuOpen.set(false)">&#1608;&#1585;&#1608;&#1583;</a><a routerLink="/register" (click)="accountMenuOpen.set(false)">&#1587;&#1575;&#1582;&#1578; &#1581;&#1587;&#1575;&#1576;</a> }
+          </div>
+        }
       </div>
-      <div class="theme-control">
-        <button
-          class="theme-trigger"
-          type="button"
-          [attr.aria-label]="'تغییر کنتراست ' + activeThemeLabel() + '؛ وضعیت فعلی: ' + contrastLabel()"
-          [title]="'کنتراست ' + activeThemeLabel() + ': ' + contrastLabel()"
-          (click)="cycleContrast()"
-        >
-          <span aria-hidden="true">{{ contrastIcon() }}</span><span class="theme-trigger-label">کنتراست {{ contrastLabel() }}</span>
-        </button>
+      <div class="appearance-controls">
+        <div class="theme-control"><button class="theme-trigger" type="button" [attr.aria-label]="'&#1578;&#1594;&#1740;&#1740;&#1585; &#1578;&#1605;&#1563; &#1608;&#1590;&#1593;&#1740;&#1578; &#1601;&#1593;&#1604;&#1740;: ' + themeModeLabel()" [title]="'&#1578;&#1605;: ' + themeModeLabel()" (click)="cycleTheme()"><span aria-hidden="true">{{ themeModeIcon() }}</span><span class="theme-trigger-label">{{ themeModeLabel() }}</span></button></div>
+        <div class="theme-control"><button class="theme-trigger" type="button" [attr.aria-label]="'&#1578;&#1594;&#1740;&#1740;&#1585; &#1705;&#1606;&#1578;&#1585;&#1575;&#1587; ' + activeThemeLabel() + '&#1563; &#1608;&#1590;&#1593;&#1740;&#1578; &#1601;&#1593;&#1604;&#1740;: ' + contrastLabel()" [title]="'&#1705;&#1606;&#1578;&#1585;&#1575;&#1587; ' + activeThemeLabel() + ': ' + contrastLabel()" (click)="cycleContrast()"><span aria-hidden="true">{{ contrastIcon() }}</span><span class="theme-trigger-label">&#1705;&#1606;&#1578;&#1585;&#1575;&#1587; {{ contrastLabel() }}</span></button></div>
       </div>
     </div>
     <button class="mobile-menu" type="button" aria-label="باز کردن منو" [attr.aria-expanded]="mobileMenuOpen()" (click)="toggleMobileMenu()">☰</button>
     @if (mobileMenuOpen()) {
-      <nav class="mobile-nav-panel" aria-label="منوی موبایل">
-        <a routerLink="/workshops" (click)="mobileMenuOpen.set(false)">کارگاه‌های تولیدی</a>
-        @if (authUser()) { <a routerLink="/workshops/new" (click)="mobileMenuOpen.set(false)">ایجاد کارگاه</a> }
-        @if (authUser(); as user) {
-          <a routerLink="/dashboard" (click)="mobileMenuOpen.set(false)">{{ user.name }} · پنل کاربری</a>
-          <a routerLink="/" (click)="logout(); mobileMenuOpen.set(false)">خروج</a>
-        } @else {
-          <a routerLink="/login" (click)="mobileMenuOpen.set(false)">ورود</a>
-          <a routerLink="/register" (click)="mobileMenuOpen.set(false)">ساخت حساب</a>
-        }
-      </nav>
-    }
+      <nav class="mobile-nav-panel" aria-label="&#1605;&#1606;&#1608;&#1740; &#1605;&#1608;&#1576;&#1575;&#1740;&#1604;">
+        <a routerLink="/workshops" (click)="mobileMenuOpen.set(false)">&#1705;&#1575;&#1585;&#1711;&#1575;&#1607;&#8204;&#1607;&#1575;&#1740; &#1578;&#1608;&#1604;&#1740;&#1583;&#1740;</a>
+      </nav>    }
   </header>
 
   <div class="workspace-layout">
-    <aside class="simin-sidebar" aria-label="ناوبری سیمین">
-      <span class="sidebar-label">سیمین پلاس</span>
+    <aside class="simin-sidebar" aria-label="&#1606;&#1575;&#1608;&#1576;&#1585;&#1740;">
       <a routerLink="/workshops" class="sidebar-link">▦ <span>کارگاه‌های تولیدی</span></a>
-      @if (authUser()) {
-        <a routerLink="/workshops/new" class="sidebar-link">＋ <span>ایجاد کارگاه</span></a>
-        <a routerLink="/dashboard" class="sidebar-link">▤ <span>پنل کاربری</span></a>
-      }
-      <div class="sidebar-divider"></div>
-      @if (authUser(); as user) {
-        <a routerLink="/dashboard" class="sidebar-link">● <span>{{ user.name }}</span></a>
-        <a routerLink="/" class="sidebar-link" (click)="logout()">↪ <span>خروج</span></a>
-      } @else {
-        <a routerLink="/login" class="sidebar-link">↪ <span>ورود</span></a>
-        <a routerLink="/register" class="sidebar-link">＋ <span>ساخت حساب</span></a>
-      }
-      @if (authUser()) { <div class="sidebar-help"><b>برای تولیدکنندگان</b><p>کارگاهت را معرفی کن تا برای ارزیابی و جذب سرمایه دیده شود.</p><a routerLink="/workshops/new">شروع ثبت ←</a></div> }
+      <a routerLink="/dashboard" class="sidebar-link">&#9673; <span>&#1581;&#1587;&#1575;&#1576; &#1705;&#1575;&#1585;&#1576;&#1585;&#1740;</span></a>
+      <a routerLink="/manage-workshops" class="sidebar-link" (click)="accountMenuOpen.set(false)">&#9881; <span>&#1605;&#1583;&#1740;&#1585;&#1740;&#1578; &#1705;&#1575;&#1585;&#1711;&#1575;&#1607;</span></a>
+      @if (authUser()?.role === 'admin') { <a routerLink="/review-workshops" class="sidebar-link" (click)="accountMenuOpen.set(false)">&#10003; <span>&#1585;&#1587;&#1740;&#1583;&#1711;&#1740; &#1576;&#1607; &#1583;&#1585;&#1582;&#1608;&#1575;&#1587;&#1578;&#8204;&#1607;&#1575;</span></a> }
+      <a routerLink="/investments" class="sidebar-link">&#9670; <span>&#1605;&#1583;&#1740;&#1585;&#1740;&#1578; &#1587;&#1585;&#1605;&#1575;&#1740;&#1607;</span></a>
     </aside>
     <div class="workspace-content">
   @if (isHomeRoute()) {
