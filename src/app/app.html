@@ -6,97 +6,76 @@
     </a>
 
     <nav class="main-nav" aria-label="ناوبری اصلی">
-      <a routerLink="/" class="nav-link active">خانه</a>
-      <a routerLink="/projects" class="nav-link">فرصت‌های سرمایه‌گذاری</a>
-      <a routerLink="/workshops" class="nav-link">کارگاه‌ها</a>
+      <a routerLink="/workshops" class="nav-link active">کارگاه‌های تولیدی</a>
     </nav>
 
     <div class="account-actions">
-      <a routerLink="/login" class="login-link">ورود</a>
-      <a routerLink="/workshops/new" class="button button-dark button-small">ثبت کارگاه <span>←</span></a>
+      @if (authUser(); as user) {
+        <a routerLink="/dashboard" class="login-link">{{ user.name }}</a>
+        <a routerLink="/workshops/new" class="button button-dark button-small">ایجاد کارگاه</a>
+        <button type="button" class="login-link logout-button" (click)="logout()">خروج</button>
+      } @else {
+        <a routerLink="/login" class="login-link">ورود</a>
+        <a routerLink="/register" class="login-link">ساخت حساب</a>
+      }
     </div>
     <div class="appearance-controls">
       <div class="theme-control">
         <button
           class="theme-trigger"
           type="button"
-          aria-label="انتخاب تم"
-          aria-controls="theme-panel"
-          [attr.aria-expanded]="themeMenuOpen()"
-          (click)="toggleThemeMenu()"
+          [attr.aria-label]="'تغییر تم؛ وضعیت فعلی: ' + themeModeLabel()"
+          [title]="'تم: ' + themeModeLabel()"
+          (click)="cycleTheme()"
         >
-          <span aria-hidden="true">◐</span><span class="theme-trigger-label">تم</span>
+          <span aria-hidden="true">{{ themeModeIcon() }}</span><span class="theme-trigger-label">{{ themeModeLabel() }}</span>
         </button>
-        @if (themeMenuOpen()) {
-          <section class="theme-panel" id="theme-panel" aria-label="انتخاب تم">
-            <h2>انتخاب تم</h2>
-            <div class="theme-mode-options" role="group" aria-label="حالت رنگ">
-              @for (mode of themeModes; track mode.value) {
-                <button type="button" [attr.aria-pressed]="themeMode() === mode.value" [class.selected]="themeMode() === mode.value" (click)="setThemeMode(mode.value)">{{ mode.label }}</button>
-              }
-            </div>
-          </section>
-        }
       </div>
       <div class="theme-control">
         <button
           class="theme-trigger"
           type="button"
-          aria-label="تنظیم کنتراست"
-          aria-controls="contrast-panel"
-          [attr.aria-expanded]="contrastMenuOpen()"
-          (click)="toggleContrastMenu()"
+          [attr.aria-label]="'تغییر کنتراست ' + activeThemeLabel() + '؛ وضعیت فعلی: ' + contrastLabel()"
+          [title]="'کنتراست ' + activeThemeLabel() + ': ' + contrastLabel()"
+          (click)="cycleContrast()"
         >
-          <span aria-hidden="true">◒</span><span class="theme-trigger-label">کنتراست</span>
+          <span aria-hidden="true">{{ contrastIcon() }}</span><span class="theme-trigger-label">کنتراست {{ contrastLabel() }}</span>
         </button>
-        @if (contrastMenuOpen()) {
-          <section class="theme-panel contrast-panel" id="contrast-panel" aria-label="تنظیم کنتراست">
-            <h2>تنظیم کنتراست</h2>
-            <fieldset class="contrast-setting">
-              <legend>کنتراست روشن</legend>
-              <div class="contrast-options" role="group" aria-label="میزان کنتراست تم روشن">
-                @for (level of contrastLevels; track level.value) {
-                  <button type="button" [attr.aria-pressed]="lightContrast() === level.value" [class.selected]="lightContrast() === level.value" (click)="setContrast('light', level.value)">{{ level.label }}</button>
-                }
-              </div>
-            </fieldset>
-            <fieldset class="contrast-setting">
-              <legend>کنتراست تاریک</legend>
-              <div class="contrast-options" role="group" aria-label="میزان کنتراست تم تاریک">
-                @for (level of contrastLevels; track level.value) {
-                  <button type="button" [attr.aria-pressed]="darkContrast() === level.value" [class.selected]="darkContrast() === level.value" (click)="setContrast('dark', level.value)">{{ level.label }}</button>
-                }
-              </div>
-            </fieldset>
-          </section>
-        }
       </div>
     </div>
     <button class="mobile-menu" type="button" aria-label="باز کردن منو" [attr.aria-expanded]="mobileMenuOpen()" (click)="toggleMobileMenu()">☰</button>
     @if (mobileMenuOpen()) {
       <nav class="mobile-nav-panel" aria-label="منوی موبایل">
-        <a routerLink="/" (click)="mobileMenuOpen.set(false)">خانه</a>
-        <a routerLink="/projects" (click)="mobileMenuOpen.set(false)">فرصت‌های سرمایه‌گذاری</a>
-        <a routerLink="/workshops" (click)="mobileMenuOpen.set(false)">کارگاه‌ها</a>
-        <a routerLink="/workshops/new" (click)="mobileMenuOpen.set(false)">ثبت کارگاه</a>
-        <a routerLink="/login" (click)="mobileMenuOpen.set(false)">ورود</a>
-        <a routerLink="/register" (click)="mobileMenuOpen.set(false)">ثبت‌نام</a>
+        <a routerLink="/workshops" (click)="mobileMenuOpen.set(false)">کارگاه‌های تولیدی</a>
+        @if (authUser()) { <a routerLink="/workshops/new" (click)="mobileMenuOpen.set(false)">ایجاد کارگاه</a> }
+        @if (authUser(); as user) {
+          <a routerLink="/dashboard" (click)="mobileMenuOpen.set(false)">{{ user.name }} · پنل کاربری</a>
+          <a routerLink="/" (click)="logout(); mobileMenuOpen.set(false)">خروج</a>
+        } @else {
+          <a routerLink="/login" (click)="mobileMenuOpen.set(false)">ورود</a>
+          <a routerLink="/register" (click)="mobileMenuOpen.set(false)">ساخت حساب</a>
+        }
       </nav>
     }
   </header>
 
   <div class="workspace-layout">
     <aside class="simin-sidebar" aria-label="ناوبری سیمین">
-      <span class="sidebar-label">سرمایه‌گذاری در تولید</span>
-      <a routerLink="/" class="sidebar-link">⌂ <span>نمای کلی</span></a>
-      <a routerLink="/projects" class="sidebar-link">◈ <span>فرصت‌های سرمایه‌گذاری</span></a>
+      <span class="sidebar-label">سیمین پلاس</span>
       <a routerLink="/workshops" class="sidebar-link">▦ <span>کارگاه‌های تولیدی</span></a>
-      <a routerLink="/workshops/new" class="sidebar-link">＋ <span>ثبت کارگاه جدید</span></a>
-      <a routerLink="/dashboard" class="sidebar-link">▤ <span>پنل کاربری</span></a>
+      @if (authUser()) {
+        <a routerLink="/workshops/new" class="sidebar-link">＋ <span>ایجاد کارگاه</span></a>
+        <a routerLink="/dashboard" class="sidebar-link">▤ <span>پنل کاربری</span></a>
+      }
       <div class="sidebar-divider"></div>
-      <a routerLink="/login" class="sidebar-link">↪ <span>ورود</span></a>
-      <a routerLink="/register" class="sidebar-link">＋ <span>ساخت حساب</span></a>
-      <div class="sidebar-help"><b>برای تولیدکنندگان</b><p>کارگاهت را معرفی کن تا برای ارزیابی و جذب سرمایه دیده شود.</p><a routerLink="/workshops/new">شروع ثبت ←</a></div>
+      @if (authUser(); as user) {
+        <a routerLink="/dashboard" class="sidebar-link">● <span>{{ user.name }}</span></a>
+        <a routerLink="/" class="sidebar-link" (click)="logout()">↪ <span>خروج</span></a>
+      } @else {
+        <a routerLink="/login" class="sidebar-link">↪ <span>ورود</span></a>
+        <a routerLink="/register" class="sidebar-link">＋ <span>ساخت حساب</span></a>
+      }
+      @if (authUser()) { <div class="sidebar-help"><b>برای تولیدکنندگان</b><p>کارگاهت را معرفی کن تا برای ارزیابی و جذب سرمایه دیده شود.</p><a routerLink="/workshops/new">شروع ثبت ←</a></div> }
     </aside>
     <div class="workspace-content">
   @if (isHomeRoute()) {

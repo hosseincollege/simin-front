@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AccountCredentials } from './account-credentials';
+import { readLocalWorkshops, saveLocalWorkshop } from './workshop-store';
 
 const API_BASE_URL = (globalThis as typeof globalThis & { SIMIN_API_URL?: string }).SIMIN_API_URL
   ?? 'http://localhost:3001';
@@ -29,25 +30,21 @@ export class LandingRoute {}
             <button class="fill-admin-button" type="button" (click)="fillAdminCredentials()">پر کردن اطلاعات ادمین</button>
           }
           @if (kind === 'register') {
-            <div class="account-json-tools">
-              <button type="button" (click)="downloadAccountJson()">دانلود نمونهٔ تکمیل‌شدهٔ ثبت‌نام (JSON)</button>
-              <label class="json-upload">بارگذاری فایل JSON<input type="file" accept="application/json,.json" (change)="importAccountJson($event)" /></label>
-              <p>فایل شامل نام کاربری و رمز عبور است؛ آن را در جای امن نگه دارید. ثبت واقعی حساب به API احراز هویت نیاز دارد.</p>
-            </div>
+            <button class="fill-admin-button" type="button" (click)="fillRegistrationFields()">پر کردن همهٔ فیلدها برای ساخت مدیر</button>
           }
           <p class="page-switch">{{ kind === 'login' ? 'حساب کاربری ندارید؟' : 'قبلاً ثبت‌نام کرده‌اید؟' }} <a [routerLink]="kind === 'login' ? '/register' : '/login'">{{ kind === 'login' ? 'ثبت‌نام' : 'ورود' }}</a></p>
-        } @else if (kind === 'create') {
+        } @else if (kind === 'create' || kind === 'edit') {
           <div class="page-heading"><span class="page-kicker">ویژهٔ تولیدکنندگان</span><h1>معرفی کارگاه تولیدی</h1><p>اطلاعات پایهٔ کارگاه را ثبت کنید تا برای بررسی و انتشار آماده شود.</p></div>
           <form (submit)="submit($event)">
-            <label>نام کارگاه<input required name="name" placeholder="مثلاً کارگاه قطعه‌سازی سپهر" /></label>
-            <label>حوزهٔ فعالیت<input required name="sector" placeholder="صنعت، کشاورزی، سلامت و ..." /></label>
-            <label>استان و شهر<input required name="location" placeholder="استان، شهر" /></label>
-            <label>شرح فعالیت<textarea required name="description" rows="4" placeholder="محصول، ظرفیت تولید و سابقهٔ کارگاه را توضیح دهید"></textarea></label>
-            <label>سرمایهٔ موردنیاز (تومان)<input required name="capital" inputmode="numeric" placeholder="مبلغ موردنیاز برای توسعه یا تولید" /></label>
-            <button type="submit">ثبت برای بررسی <span>←</span></button>
+            <label>نام کارگاه<input required name="name" [value]="editRecord?.['title'] || ''" placeholder="مثلاً کارگاه قطعه‌سازی سپهر" /></label>
+            <label>حوزهٔ فعالیت<input required name="sector" [value]="editRecord?.['category'] || ''" placeholder="صنعت، کشاورزی، سلامت و ..." /></label>
+            <label>استان و شهر<input required name="location" [value]="editRecord?.['location'] || ''" placeholder="استان، شهر" /></label>
+            <label>شرح فعالیت<textarea required name="description" rows="4" [value]="editRecord?.['description'] || ''" placeholder="محصول، ظرفیت تولید و سابقهٔ کارگاه را توضیح دهید"></textarea></label>
+            <label>سرمایهٔ موردنیاز (تومان)<input required name="capital" inputmode="numeric" [value]="editRecord?.['required_capital'] || ''" placeholder="مبلغ موردنیاز برای توسعه یا تولید" /></label>
+            <button type="submit">{{ kind === 'edit' ? 'ذخیرهٔ تغییرات' : 'ایجاد کارگاه' }} <span>←</span></button>
             @if (message) { <p class="page-message">{{ message }}</p> }
           </form>
-          <p class="detail-copy">ثبت این فرم در حال حاضر نمایشی است؛ برای انتشار عمومی کارگاه و مدیریت مالکیت، API و احراز هویت بک‌اند لازم است.</p>
+          <p class="detail-copy">اطلاعات در این نسخه روی همین مرورگر ذخیره می‌شود؛ فرصت سرمایه‌گذاری در پروندهٔ خود کارگاه نمایش داده می‌شود.</p>
         } @else if (kind === 'dashboard') {
           <div class="page-heading"><span class="page-kicker">فضای کاربری</span><h1>پنل سیمین</h1><p>مدیریت کارگاه‌ها، بررسی گزارش‌ها و پیگیری فرصت‌های سرمایه‌گذاری.</p></div>
           <div class="page-project-list"><a routerLink="/workshops/new"><b>ثبت کارگاه</b><span>معرفی طرح تولیدی برای ارزیابی</span></a><a routerLink="/workshops"><b>کارگاه‌های عمومی</b><span>مشاهدهٔ طرح‌های ثبت‌شده</span></a><a routerLink="/projects"><b>فرصت‌های سرمایه‌گذاری</b><span>بررسی فرصت‌های فعال</span></a></div>
@@ -66,25 +63,26 @@ export class LandingRoute {}
     </main>
   `,
   styles: [`
-    :host{font-family:'Vazirmatn',Tahoma,sans-serif}.page-overlay{position:fixed;inset:0;z-index:10;overflow:auto;background:#f4f7f4;display:grid;place-items:center;padding:24px}.page-card{position:relative;width:min(100%,620px);background:#fff;border:1px solid #e8ede9;border-radius:22px;padding:40px;box-shadow:0 24px 80px #173e2d20}.page-brand{display:inline-flex;flex-direction:column;text-decoration:none;color:#142d27;font-size:22px;font-weight:800}.page-brand span{font-size:10px;color:#87938c;font-weight:500}.page-back{position:absolute;left:40px;top:48px;text-decoration:none;color:#1e6950;font-size:12px}.page-heading{margin:35px 0 25px}.page-kicker{color:#1e6950;font-size:11px;font-weight:700}.page-heading h1{font-size:25px;margin:8px 0}.page-heading p,.detail-copy{color:#7c8982;font-size:12px;line-height:2}.page-card form{display:grid;gap:15px}.page-card label{display:grid;gap:7px;font-size:11px;font-weight:700}.page-card input,.page-card textarea{border:1px solid #e4eae5;border-radius:9px;padding:12px;font:inherit;font-size:12px;outline-color:#1e6950}.page-card form button{border:0;border-radius:9px;background:#1e6950;color:white;padding:13px;font:inherit;font-size:13px;cursor:pointer}.page-switch{text-align:center;color:#75827b;font-size:11px;margin-top:20px}.page-switch a{color:#1e6950;font-weight:700}.page-message{color:#9a6d22;font-size:11px;text-align:center}.page-project-list{display:grid;gap:10px}.page-project-list a{display:flex;justify-content:space-between;gap:15px;padding:16px;border:1px solid #e8ede9;border-radius:11px;text-decoration:none}.page-project-list b{font-size:12px}.page-project-list span{font-size:10px;color:#829088}.detail-summary{display:flex;align-items:center;gap:16px;background:#f2f7f3;border-radius:13px;padding:17px}.detail-icon{display:grid;place-items:center;width:52px;height:52px;background:#dcece0;border-radius:14px;font-size:27px;color:#1e6950}.detail-summary h2{font-size:15px;margin:0 0 5px}.detail-summary p{font-size:11px;color:#7b8981;margin:0}.detail-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}.detail-stats div{padding:12px;border:1px solid #e8ede9;border-radius:10px}.detail-stats small,.detail-stats b{display:block}.detail-stats small{font-size:9px;color:#89958e;margin-bottom:7px}.detail-stats b{font-size:11px}@media(max-width:600px){.page-card{padding:28px 21px}.page-back{left:21px;top:34px;font-size:10px}.page-project-list a{flex-direction:column}.detail-stats{grid-template-columns:1fr}}
-    .account-json-tools{display:grid;gap:9px;margin-top:14px}.account-json-tools button,.account-json-tools .json-upload,.fill-admin-button{border:1px solid #dce7de;border-radius:9px;background:#f2f7f3;color:#245d42;padding:11px;text-align:center;font:inherit;font-size:11px;cursor:pointer}.fill-admin-button{display:block;width:100%;margin-top:10px}.account-json-tools .json-upload input{display:block;width:100%;margin-top:8px;font-size:10px}.account-json-tools p{margin:0;color:#77857d;font-size:10px;line-height:1.8}
+    :host{font-family:'Vazirmatn',Tahoma,sans-serif}.page-overlay{position:fixed;inset:0;z-index:10;overflow:auto;background:#f4f7f4;display:grid;place-items:center;padding:24px}.page-card{position:relative;width:min(100%,620px);background:#fff;border:1px solid #e8ede9;border-radius:22px;padding:40px;box-shadow:0 24px 80px #173e2d20}.page-brand{display:inline-flex;flex-direction:column;text-decoration:none;color:#142d27;font-size:22px;font-weight:800}.page-brand span{font-size:10px;color:#87938c;font-weight:500}.page-back{position:absolute;left:40px;top:48px;text-decoration:none;color:#1e6950;font-size:12px}.page-heading{margin:35px 0 25px}.page-kicker{color:#1e6950;font-size:11px;font-weight:700}.page-heading h1{font-size:25px;margin:8px 0}.page-heading p,.detail-copy{color:#7c8982;font-size:12px;line-height:2}.page-card form{display:grid;gap:15px}.page-card label{display:grid;gap:7px;font-size:11px;font-weight:700}.page-card input,.page-card textarea{border:1px solid #e4eae5;border-radius:9px;padding:12px;font:inherit;font-size:12px;outline-color:#1e6950}.page-card form button{border:0;border-radius:9px;background:#1e6950;color:white;padding:13px;font:inherit;font-size:13px;cursor:pointer}.page-switch{text-align:center;color:#75827b;font-size:11px;margin-top:20px}.page-switch a{color:#1e6950;font-weight:700}.page-message{color:#9a6d22;font-size:11px;text-align:center}.page-project-list{display:grid;gap:10px}.page-project-list a{display:flex;justify-content:space-between;gap:15px;padding:16px;border:1px solid #e8ede9;border-radius:11px;text-decoration:none}.page-project-list b{font-size:12px}.page-project-list span{font-size:10px;color:#829088}.detail-summary{display:flex;align-items:center;gap:16px;background:#f2f7f3;border-radius:13px;padding:17px}.detail-icon{display:grid;place-items:center;width:52px;height:52px;background:#dcece0;border-radius:14px;font-size:27px;color:#1e6950}.detail-summary h2{font-size:15px;margin:0 0 5px}.detail-summary p{font-size:11px;color:#7b8981;margin:0}.detail-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}.detail-stats div,.detail-grid>div{padding:12px;border:1px solid #e8ede9;border-radius:10px}.detail-stats small,.detail-stats b,.detail-grid small,.detail-grid b{display:block}.detail-stats small,.detail-grid small{font-size:9px;color:#89958e;margin-bottom:7px}.detail-stats b,.detail-grid b{font-size:11px}.workshop-cover{width:100%;max-height:330px;object-fit:cover;border-radius:14px;margin:16px 0}.workshop-section{margin-top:22px;padding-top:17px;border-top:1px solid #edf0ed}.workshop-section h2{font-size:15px}.workshop-section>p{font-size:12px;line-height:2;color:#66756d}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.workshop-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.workshop-gallery img{width:100%;height:110px;object-fit:cover;border-radius:9px}.report-controls{display:flex;gap:12px}.report-controls select{font:inherit;padding:7px;border:1px solid #dfe7e1;border-radius:8px}.report-bars{height:140px;display:flex;align-items:end;gap:5px;margin-top:18px;border-bottom:1px solid #dfe7e1}.report-bar{height:100%;flex:1;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:5px}.report-bar i{width:70%;max-width:30px;min-height:3px;background:#458b62;border-radius:5px 5px 0 0}.report-bar small{font-size:8px;color:#78867e}@media(max-width:600px){.page-card{padding:28px 21px}.page-back{left:21px;top:34px;font-size:10px}.page-project-list a{flex-direction:column}.detail-stats{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.workshop-gallery{grid-template-columns:repeat(2,1fr)}}
+    .fill-admin-button{display:block;width:100%;margin-top:10px;border:1px solid #dce7de;border-radius:9px;background:#f2f7f3;color:#245d42;padding:11px;text-align:center;font:inherit;font-size:11px;cursor:pointer}
     .page-overlay{position:relative;inset:auto;z-index:auto;display:block;min-height:calc(100vh - 180px);padding:24px 0;background:transparent!important}.page-card{margin-inline:auto}
   `],
 })
 export class PortalPage {
   readonly kind: string;
+  readonly editRecord: Record<string, unknown> | undefined;
   private readonly messageState = signal('');
   get message() { return this.messageState(); }
   set message(value: string) { this.messageState.set(value); }
-  private bootstrapAdmin = false;
-
-  constructor(route: ActivatedRoute, private readonly credentials: AccountCredentials) {
+  constructor(route: ActivatedRoute, private readonly credentials: AccountCredentials, private readonly router: Router) {
     this.kind = route.snapshot.data['kind'] ?? (route.snapshot.paramMap.has('id') ? 'detail' : 'projects');
+    const editId = route.snapshot.paramMap.get('id');
+    this.editRecord = editId ? readLocalWorkshops().find((item) => item.id === editId) : undefined;
   }
 
   async submit(event: Event) {
     event.preventDefault();
-    if (this.kind !== 'login' && this.kind !== 'register') {
+    if (!['login', 'register', 'create', 'edit'].includes(this.kind)) {
       this.message = 'این فرم هنوز به API مربوطه متصل نشده است.';
       return;
     }
@@ -92,6 +90,18 @@ export class PortalPage {
     const values = new FormData(form);
     const payload: Record<string, string> = {};
     values.forEach((value, key) => { payload[key] = String(value).trim(); });
+    if (this.kind === 'create' || this.kind === 'edit') {
+      const locationParts = (payload['location'] || '').split(/[،,]/).map((part) => part.trim());
+      saveLocalWorkshop({
+        ...(this.editRecord?.['id'] ? { id: String(this.editRecord['id']) } : {}),
+        title: payload['name'], category: payload['sector'], province: locationParts[0] || '',
+        location: locationParts.slice(1).join('، ') || locationParts[0] || '',
+        description: payload['description'], required_capital: Number(payload['capital']) || 0,
+        investments: [{ purpose: 'سرمایهٔ موردنیاز برای توسعهٔ همین کارگاه', amount: Number(payload['capital']) || 0 }],
+      });
+      await this.router.navigateByUrl('/workshops');
+      return;
+    }
     this.message = 'در حال ارتباط با سرور…';
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/${this.kind}`, {
@@ -102,13 +112,14 @@ export class PortalPage {
       const result = await response.json() as { message?: string | string[]; token?: string; user?: { name: string; username: string; role: string } };
       if (!response.ok) throw new Error(Array.isArray(result.message) ? result.message.join(' ') : result.message || 'درخواست انجام نشد.');
       if (this.kind === 'register') {
+        this.credentials.saveAdmin(payload['username'], payload['password']);
         this.message = 'حساب کاربری با موفقیت ساخته شد. حالا می‌توانید وارد شوید.';
         form.reset();
-        this.bootstrapAdmin = false;
       } else if (result.token && result.user) {
         localStorage.setItem('simin.auth.token', result.token);
         localStorage.setItem('simin.auth.user', JSON.stringify(result.user));
         this.message = `ورود موفق بود. خوش آمدید ${result.user.name}.`;
+        await this.router.navigateByUrl('/');
       }
     } catch (error) {
       this.message = error instanceof TypeError
@@ -117,61 +128,26 @@ export class PortalPage {
     }
   }
 
-  downloadAccountJson() {
-    const random = new Uint8Array(16);
+  fillRegistrationFields() {
+    const random = new Uint8Array(12);
     crypto.getRandomValues(random);
     const suffix = Array.from(random.slice(0, 4), (value) => value.toString(16).padStart(2, '0')).join('');
     const password = Array.from(random, (value) => value.toString(16).padStart(2, '0')).join('');
-    const account = {
-      type: 'simin-admin-account',
-      version: 1,
-      role: 'admin',
-      name: 'مدیر سیمین',
-      username: `admin-${suffix}`,
-      password,
-    };
+    const account = { name: 'مدیر سیمین', username: `admin-${suffix}`, password };
+    const name = document.querySelector<HTMLInputElement>('input[name="name"]');
+    const username = document.querySelector<HTMLInputElement>('input[name="username"]');
+    const passwordInput = document.querySelector<HTMLInputElement>('input[name="password"]');
+    if (name) name.value = account.name;
+    if (username) username.value = account.username;
+    if (passwordInput) passwordInput.value = account.password;
     this.credentials.saveAdmin(account.username, account.password);
-    const file = new Blob([JSON.stringify(account, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(file);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'simin-admin-account.json';
-    link.click();
-    URL.revokeObjectURL(url);
-    this.message = `نمونهٔ کامل ثبت‌نام دانلود شد (${account.username}). همان فایل را بارگذاری کن تا نام، نام کاربری و رمز وارد فرم شوند.`;
-  }
-
-  importAccountJson(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const data = JSON.parse(String(reader.result)) as { type?: string; role?: string; name?: string; username?: string; password?: string };
-        if (data.type !== 'simin-admin-account' || data.role !== 'admin' || typeof data.name !== 'string' || typeof data.username !== 'string' || typeof data.password !== 'string') {
-          throw new Error('invalid account file');
-        }
-        const name = document.querySelector<HTMLInputElement>('input[name="name"]');
-        const username = document.querySelector<HTMLInputElement>('input[name="username"]');
-        const password = document.querySelector<HTMLInputElement>('input[name="password"]');
-        if (name) name.value = data.name;
-        if (username) username.value = data.username;
-        if (password) password.value = data.password;
-        this.credentials.saveAdmin(data.username, data.password);
-        this.bootstrapAdmin = true;
-        this.message = 'همهٔ فیلدهای ثبت‌نام از فایل پر شد؛ فرم آمادهٔ ثبت است.';
-      } catch {
-        this.message = 'فایل JSON معتبر نیست یا قالب سیمین را ندارد.';
-      }
-    };
-    reader.readAsText(file);
+    this.message = 'اطلاعات حساب مدیر پر شد؛ ثبت‌نام را بزنید.';
   }
 
   fillAdminCredentials() {
     const account = this.credentials.readAdmin();
     if (!account) {
-      this.message = 'ابتدا فایل JSON ادمین را در همین نشست بارگذاری کن.';
+      this.message = 'ابتدا در صفحهٔ ثبت‌نام «پر کردن همهٔ فیلدها» و سپس ثبت‌نام را بزنید.';
       return;
     }
     const username = document.querySelector<HTMLInputElement>('input[name="username"]');

@@ -28,21 +28,10 @@ export class App {
   readonly currentPath = signal('/');
   readonly isHomeRoute = computed(() => this.currentPath() === '/');
   readonly mobileMenuOpen = signal(false);
-  readonly themeMenuOpen = signal(false);
-  readonly contrastMenuOpen = signal(false);
+  readonly authUser = signal<{ name: string; username: string; role: string } | null>(null);
   readonly themeMode = signal<ThemeMode>('system');
   readonly lightContrast = signal<ContrastLevel>('standard');
   readonly darkContrast = signal<ContrastLevel>('standard');
-  readonly themeModes: { value: ThemeMode; label: string }[] = [
-    { value: 'system', label: 'سیستم' },
-    { value: 'light', label: 'روشن' },
-    { value: 'dark', label: 'تاریک' },
-  ];
-  readonly contrastLevels: { value: ContrastLevel; label: string }[] = [
-    { value: 'low', label: 'کم' },
-    { value: 'standard', label: 'معمولی' },
-    { value: 'high', label: 'زیاد' },
-  ];
   readonly selectedCategory = signal('همه');
   readonly searchTerm = signal('');
   readonly categories = ['همه', 'صنعت', 'کشاورزی', 'فناوری', 'سلامت'];
@@ -66,8 +55,10 @@ export class App {
 
   constructor(router: Router) {
     this.currentPath.set(router.url.split('?')[0] || '/');
+    this.loadAuthUser();
     router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd)).subscribe((event) => {
       this.currentPath.set(event.urlAfterRedirects.split('?')[0] || '/');
+      this.loadAuthUser();
     });
     if (typeof window !== 'undefined') {
       try {
@@ -98,14 +89,55 @@ export class App {
     this.applyTheme();
   }
 
-  toggleThemeMenu() {
-    this.contrastMenuOpen.set(false);
-    this.themeMenuOpen.update((open) => !open);
+  cycleTheme() {
+    const cycle: ThemeMode[] = ['system', 'dark', 'light'];
+    const next = (cycle.indexOf(this.themeMode()) + 1) % cycle.length;
+    this.setThemeMode(cycle[next]);
   }
 
-  toggleContrastMenu() {
-    this.themeMenuOpen.set(false);
-    this.contrastMenuOpen.update((open) => !open);
+  themeModeLabel(): string {
+    return { system: 'سیستم', dark: 'تیره', light: 'روشن' }[this.themeMode()];
+  }
+
+  themeModeIcon(): string {
+    return { system: '🖥', dark: '☾', light: '☀' }[this.themeMode()];
+  }
+
+  private loadAuthUser() {
+    try {
+      const value = localStorage.getItem('simin.auth.user');
+      this.authUser.set(value ? JSON.parse(value) as { name: string; username: string; role: string } : null);
+    } catch {
+      this.authUser.set(null);
+    }
+  }
+
+  logout() {
+    localStorage.removeItem('simin.auth.token');
+    localStorage.removeItem('simin.auth.user');
+    this.authUser.set(null);
+  }
+
+  activeThemeLabel(): string {
+    return this.effectiveTheme() === 'dark' ? 'تیره' : 'روشن';
+  }
+
+  contrastLabel(): string {
+    const level = this.effectiveTheme() === 'dark' ? this.darkContrast() : this.lightContrast();
+    return { low: 'کم', standard: 'معمولی', high: 'زیاد' }[level];
+  }
+
+  contrastIcon(): string {
+    const level = this.effectiveTheme() === 'dark' ? this.darkContrast() : this.lightContrast();
+    return { low: '◔', standard: '◑', high: '●' }[level];
+  }
+
+  cycleContrast() {
+    const theme = this.effectiveTheme();
+    const current = theme === 'dark' ? this.darkContrast() : this.lightContrast();
+    const cycle: ContrastLevel[] = ['low', 'standard', 'high'];
+    const next = (cycle.indexOf(current) + 1) % cycle.length;
+    this.setContrast(theme, cycle[next]);
   }
 
   setContrast(theme: 'light' | 'dark', level: ContrastLevel) {
@@ -117,14 +149,16 @@ export class App {
 
   private readonly applyTheme = () => {
     if (typeof document === 'undefined') return;
-    const preference = this.themeMode();
-    const theme = preference === 'system'
-      ? (this.darkModeQuery?.matches ? 'dark' : 'light')
-      : preference;
+    const theme = this.effectiveTheme();
     const contrast = theme === 'dark' ? this.darkContrast() : this.lightContrast();
     document.documentElement.dataset['theme'] = theme;
     document.documentElement.dataset['contrast'] = contrast;
   };
+
+  private effectiveTheme(): 'light' | 'dark' {
+    const preference = this.themeMode();
+    return preference === 'system' ? (this.darkModeQuery?.matches ? 'dark' : 'light') : preference;
+  }
 
   private saveThemePreferences() {
     try {

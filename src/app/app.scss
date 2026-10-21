@@ -9,9 +9,19 @@
 
 /* Keep shared navigation visible while route content scrolls. */
 .app-shell{overflow:visible}
-.app-shell{width:100%;max-width:none;margin:0;padding-inline:24px}
-.topbar{position:sticky;top:0;z-index:50;background:var(--surface)}
-.simin-sidebar{position:sticky;top:100px;align-self:start;height:calc(100vh - 120px);overflow-y:auto}
-@media(max-width:700px){.simin-sidebar{position:sticky;top:74px;height:auto;overflow:visible}}
+.app-shell{width:100%;max-width:none;margin:0;padding:0}
+.topbar{position:sticky;top:0;z-index:50;background:var(--surface);padding-inline:24px}
+.workspace-layout{padding-inline:24px}
+.workspace-content{grid-column:2}
+.topbar{position:sticky;isolation:isolate}
+.logout-button{border:0;background:none;cursor:pointer;font:inherit;padding:0}
+.edit-link{align-self:center;flex:0 0 auto;padding:10px 14px;border:1px solid var(--border);border-radius:9px;color:var(--accent);text-decoration:none;font-size:12px;font-weight:700}
+.topbar>.brand{position:absolute;left:50%;transform:translateX(-50%)}
+.appearance-controls{margin-inline-start:auto}
+.theme-trigger-label{display:none}
+.simin-sidebar{position:fixed;top:82px;right:0;bottom:0;width:220px;height:calc(100vh - 82px);max-height:none;overflow-y:auto;align-self:start;margin:0;border-radius:0;border-inline-start:0;border-bottom:0}
+.workspace-layout{display:block;padding:0 244px 0 24px}
+@media(max-width:1050px) and (min-width:701px){.simin-sidebar{width:190px}}
+@media(max-width:700px){.topbar{padding-inline:14px}.topbar>.brand{position:static;transform:none}.appearance-controls{margin-inline-start:auto}.workspace-layout{display:block;padding-inline:14px}.workspace-content{grid-column:auto}.simin-sidebar{position:static;top:auto;right:auto;bottom:auto;width:auto;height:auto;max-height:none;overflow:visible;border:1px solid var(--line);border-radius:12px;margin:0 0 12px}}
 .mobile-nav-panel{display:none}
 @media(max-width:700px){.topbar{position:sticky}.mobile-nav-panel{position:absolute;display:grid;grid-template-columns:1fr 1fr;gap:4px;top:calc(100% + 1px);inset-inline:0;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:0 0 14px 14px;box-shadow:0 14px 24px #0002}.mobile-nav-panel a{padding:11px 9px;text-decoration:none;color:var(--ink);font-size:11px;border-radius:8px}.mobile-nav-panel a:hover{background:var(--mint);color:var(--green)}}
