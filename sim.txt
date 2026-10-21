@@ -1,0 +1,18 @@
+cd back
+npm run start:dev
+
+
+cd front
+npm start
+
+
+git config --global user.name "hosseincollege"
+git config --global user.email "hosseincollege@gmail.com"
+
+git config --global --add safe.directory "*"
+
+
+git add .
+git commit -m "Final working "
+git push origin main --force
+
